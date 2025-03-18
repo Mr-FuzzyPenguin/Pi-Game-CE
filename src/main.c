@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdint.h>
 #include <ti/screen.h>
 #include <ti/getcsc.h>
@@ -19,12 +20,8 @@ int main(void)
     os_PutStrLine("Type the first digit of \xc4");
     /* Waits for a key */
     uint8_t key = 0;
-    int8_t offset;
-    while (!key)
-    {
-        key = os_GetCSC();
-    }
-
+    uint8_t offset;
+    volatile uint32_t points = 0;
     char output[MAXCOLS+1];
     while (key != sk_Clear)
     {
@@ -62,35 +59,41 @@ int main(void)
                 offset = 9;
                 break;
             default:
-                offset = -1*'0'+key;
+                offset = 10;
                 break;
         }
 
-        // sprintf is bad so I won't use it for now
-        os_SetCursorPos(5, 0);
-        for (uint8_t i =0; i < MAXCOLS; i++){
-            if (i % 2)
+        // a valid key press. Judge if it was a correct press.
+        if (offset >= 0 && offset < 10)
+        {
+            sprintf(output, "Pressed: %d", offset);
+            os_SetCursorPos(2, 0);
+            os_PutStrLine(output);
+
+            uint8_t check;
+            os_SetCursorPos(3, 0);
+            if (points % 2)
             {
-                output[i] = '0'+((pi_index[i] & 0b11110000)>> 4);
+                check = (pi_index[points/2] & 0x0f);
             }
             else
             {
-                output[i] = '0'+(pi_index[i] & 0x0f);
+                check = ((pi_index[points/2] & 0xf0) >> 4);
             }
+            sprintf(output, "Next: %d", check);
+
+            if (check == offset)
+            {
+                os_SetCursorPos(3, 0);
+                os_PutStrLine("         ");
+
+
+                os_SetCursorPos(4, 0);
+                points++;
+                sprintf(output, "Points: %lu", points);
+            }
+            os_PutStrLine(output);
         }
-
-        // adding a 0 at the end
-        output[MAXCOLS] = 0;
-        os_PutStrLine(output);
-
-        // still testing stuff to verify bit shifts are correct.
-        os_SetCursorPos(2, 0);
-        output[0] = '0'+offset;
-        output[1] = ' ';
-        output[2] = '0'+((pi_index[0] & 0b11110000)>> 4);
-        output[3] = '0'+(pi_index[1] & 0x0f);
-        output[4] = 0;
-        os_PutStrLine(output);
     }
 
     /* Return 0 for success */
