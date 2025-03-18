@@ -8,5 +8,8 @@ Today, with some experience with AVR-Assembly, very terrible (and nearly nonexis
 ### Goal:
 Speed up the game with C to make it magnitudes *faster*, and also store 100k digits instead of the measly (and pathetic) 1k digits that the |L PI list(s) types on the calculator's Ti-BASIC program limits you to storing.
 
+### Known limitations:
+Sometimes the Calculator will throw an, "Error: Memory", which states that it has ran out of memory, or does nothave enough memory to continue. The reason why this happens is because, the 50kb size array of `uint8_t` hex values storing each individual digit of Pi in a nibble is... well... there's no easy way to put it... it's absolutely gigantic. So much so, that sometimes the calculator will require a reset. You can do so by hitting the following keys in sequence: [2nd] + [+] + [7] + [1] + [2] and it may resolve the "Error: Memory" issue.
+
 ### Dedication:
 This program was made for my sister ~~who probably should be paying attention in math class instead of playing this game~~
