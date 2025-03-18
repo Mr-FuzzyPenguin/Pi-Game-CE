@@ -1,4 +1,4 @@
-const uint8_t pi_index[50000] = {
+const static uint8_t pi_index[50000] = {
     0x31,
     0x41,
     0x59,
