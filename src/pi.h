@@ -1,4 +1,6 @@
-const static uint8_t pi_index[50000] = {
+#define ARRSIZE 50000UL
+
+const static uint8_t pi_index[ARRSIZE] = {
     0x31,
     0x41,
     0x59,
