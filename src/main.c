@@ -1,6 +1,5 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
-#include <debug.h>
 #include "pi.h"
 
 #define MAXROWS 10
@@ -143,7 +142,6 @@ void print_pi(uint32_t max_digit)
     temp[history_index] = 0;
 
     os_PutStrFull(temp);
-    dbg_sprintf(dbgout, "%s", temp);
 }
 
 // End screen prompting the user to hit Clear to end
@@ -163,16 +161,6 @@ void end_screen()
 // if the parameter == 0 then it's in practice, else quiz mode
 void game(uint8_t return_on_incorrect)
 {
-    os_SetCursorPos(7, 0);
-    if (return_on_incorrect)
-    {
-        os_PutStrLine("quiz mode!");
-    }
-    else
-    {
-        os_PutStrLine("practiCE mode!");
-    }
-
     // Waits for a key
     uint8_t key = 0;
     uint8_t parsed = 10;
@@ -305,10 +293,18 @@ uint32_t input_func(char* prompt){
             os_PutStrFull("Is not a valid number.");
             getkey();
             // larger than max, which is invalid.
-            return ARRSIZE + 1;
+            return 0;
         }
         i++;
     }
+
+    os_SetCursorPos(7, 0);
+    os_PutStrLine("explore mode!");
+    os_SetCursorPos(8, 0);
+    os_PutStrLine("You can try to guess the");
+    os_SetCursorPos(9, 0);
+    os_PutStrLine("next number as well!");
+
     return parsed_number;
 }
 
@@ -340,6 +336,12 @@ void pi_explorer()
             number_result = 2*ARRSIZE;
         }
 
+        // pressed numpad key matches next digit and number result is not the last digit
+        if (parseKey(key) == fetch_pi_index(number_result) && number_result != 2*ARRSIZE)
+        {
+            number_result++;
+        }
+
         // display it
         os_SetCursorPos(0, 0);
         os_PutStrFull("Rightmost digit: ");
@@ -352,8 +354,6 @@ void pi_explorer()
         // get the next key press
         key = getkey();
     }
-
-
 }
 
 int main(void)
@@ -430,12 +430,15 @@ int main(void)
 
     // game mode selector
     os_ClrLCDFull();
+    os_SetCursorPos(7, 0);
     switch(mode)
     {
         case 0:
+            os_PutStrLine("quiz mode!");
             game(1);
             break;
         case 1:
+            os_PutStrLine("practiCE mode!");
             game(0);
             break;
         case 2:
